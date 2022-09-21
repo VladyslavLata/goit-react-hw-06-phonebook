@@ -1,37 +1,30 @@
-import { useState, useEffect } from 'react';
+import { useSelector, useDispatch } from 'react-redux';
 import { Section } from './Section/Section';
 import { PhonebookForm } from './PhonebookForm/PhonebookForm';
 import { Contacts } from './Contacts/Contacts';
 import { Filter } from './Filter/Filter';
-
-const MY_CONTACTS = 'myContacts';
+import { add, remove, filter } from 'redux/contacts/contactsSlice';
+import { getContacts, getFilterName } from 'redux/contacts/selectors';
 
 export const App = () => {
-  const [contacts, setContacts] = useState(() => {
-    return JSON.parse(localStorage.getItem(MY_CONTACTS)) ?? [];
-  });
-  const [name, setName] = useState('');
-
-  useEffect(() => {
-    localStorage.setItem(MY_CONTACTS, JSON.stringify(contacts));
-  }, [contacts]);
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
+  const name = useSelector(getFilterName);
 
   const reviewNameInContacts = name => {
     return contacts.find(contact => contact.name === name);
   };
 
   const addContact = contact => {
-    setContacts(state => [contact, ...state]);
+    dispatch(add(contact));
   };
 
   const removeContact = removeContactId => {
-    setContacts(state =>
-      state.filter(contact => contact.id !== removeContactId)
-    );
+    dispatch(remove(removeContactId));
   };
 
   const changeFilter = e => {
-    setName(e.currentTarget.value.trimStart());
+    dispatch(filter(e.currentTarget.value.trimStart()));
   };
 
   const getVisibleContacts = () => {
